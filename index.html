@@ -1,0 +1,1891 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eef5fb">
+  <title>Marshall, Texas Weather</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #142b40;
+      background: #eef5fb;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --muted: #61778b;
+      --line: #e3edf5;
+      --blue: #286bb4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(195, 224, 249, .55), transparent 38rem),
+        #f4f8fc;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(1080px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 34px 0 28px;
+    }
+
+    .topbar, .heading, .card-heading, .section-heading, .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #42617c;
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid #d8e6f2;
+      border-radius: 12px;
+      background: white;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border: 1px solid #d8e5f0;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .8);
+      color: #315777;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .refresh:hover { background: white; }
+    .refresh:disabled { cursor: wait; opacity: .65; }
+
+    .heading { margin: 35px 0 20px; align-items: flex-end; }
+    h1 { margin: 0; color: #132c43; font-size: clamp(30px, 5vw, 43px); letter-spacing: -.045em; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+    .source-tag {
+      flex: none;
+      padding: 7px 10px;
+      border: 1px solid #dce8f2;
+      border-radius: 999px;
+      background: rgba(255,255,255,.65);
+      color: #59738a;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .location-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .location-select, .location-input, .unit-toggle, .location-button {
+      min-height: 38px;
+      padding: 8px 11px;
+      border: 1px solid #d8e5f0;
+      border-radius: 10px;
+      background: rgba(255,255,255,.88);
+      color: #315777;
+      font: inherit;
+      font-size: 13px;
+    }
+    .location-input { width: min(180px, 45vw); }
+    .location-button, .unit-toggle { cursor: pointer; font-weight: 650; }
+    .location-button:hover, .unit-toggle:hover { background: white; }
+    .location-button:disabled { cursor: wait; opacity: .6; }
+    .location-search-results { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+    .location-result { padding: 7px 10px; border: 1px solid #d8e5f0; border-radius: 999px; background: white; color: #315777; cursor: pointer; font-size: 12px; }
+    .location-result:hover { background: #f1f8fd; }
+    .location-feedback { min-height: 16px; margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+    .alert-list { display: grid; gap: 10px; margin-bottom: 18px; }
+    .alert-card { padding: 14px 17px; border: 1px solid #edc8a2; border-radius: 13px; background: #fff7ed; color: #774214; font-size: 13px; line-height: 1.5; }
+    .alert-card.warning { border-color: #e5a2a0; background: #fff2f1; color: #852e29; }
+    .alert-card.watch { border-color: #ecd18c; background: #fffbed; color: #725817; }
+    .alert-card h2 { margin-bottom: 5px; color: inherit; font-size: 15px; }
+    .alert-card p { margin: 0; }
+
+    .card {
+      border: 1px solid rgba(211, 226, 239, .85);
+      border-radius: 19px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 10px 35px rgba(43, 82, 117, .055);
+    }
+
+    .current {
+      position: relative;
+      overflow: hidden;
+      min-height: 274px;
+      padding: 28px 32px;
+      border: 0;
+      background: linear-gradient(119deg, #174f86 0%, #2878b9 53%, #54a1d1 100%);
+      color: white;
+      box-shadow: 0 18px 42px rgba(36, 103, 159, .2);
+    }
+
+    .current::after {
+      position: absolute;
+      right: 6%;
+      bottom: -164px;
+      width: 360px;
+      height: 360px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(255,255,255,.035), 0 0 0 78px rgba(255,255,255,.025);
+      content: "";
+      pointer-events: none;
+    }
+
+    .card-heading { position: relative; z-index: 1; align-items: flex-start; }
+    .eyebrow { margin: 0; color: #d3eafa; font-size: 12px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+    .updated { margin: 5px 0 0; color: #d3eafa; font-size: 12px; }
+    .current-main {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .weather-symbol { width: 86px; font-size: 69px; line-height: 1; text-align: center; filter: drop-shadow(0 5px 7px rgba(4, 36, 65, .16)); }
+    .temperature { font-size: clamp(65px, 10vw, 91px); font-weight: 350; letter-spacing: -.075em; line-height: .95; }
+    .condition { margin: 12px 0 0; color: #e0f0fc; font-size: 16px; }
+    .current-details {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 24px;
+    }
+    .detail-pill { padding: 7px 10px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.1); color: #eef8ff; font-size: 12px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .metric { padding: 15px; }
+    .metric-label { color: var(--muted); font-size: 11px; }
+    .metric-value { margin-top: 6px; color: #18364f; font-size: 18px; font-weight: 750; }
+    .metric-note { margin-top: 4px; color: #71869a; font-size: 11px; }
+    .learning-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .learning-card { padding: 20px; }
+    .learning-card h3 { margin: 0 0 10px; color: #203c55; font-size: 15px; }
+    .learning-copy { margin: 0; color: #526d83; font-size: 13px; line-height: 1.6; }
+    .learning-kicker { margin: 0 0 8px; color: #5680a1; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .learning-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+    .learning-button, .safety-answer, .hunt-task, .climate-tab {
+      padding: 9px 12px;
+      border: 1px solid #d8e5f0;
+      border-radius: 10px;
+      background: white;
+      color: #315777;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .learning-button:hover, .safety-answer:hover, .hunt-task:hover:not(:disabled), .climate-tab:hover { background: #f1f8fd; }
+    .learning-button:focus-visible, .safety-answer:focus-visible, .hunt-task:focus-visible, .climate-tab:focus-visible { outline: 3px solid #8ab5d7; outline-offset: 2px; }
+    .safety-answers { display: grid; gap: 8px; margin-top: 13px; }
+    .safety-answer { text-align: left; }
+    .safety-answer.correct { border-color: #8ac6a0; background: #eff9f2; color: #28613a; }
+    .safety-answer.incorrect { border-color: #e4a5a0; background: #fff4f2; color: #8a342d; }
+    .learning-feedback { min-height: 20px; margin: 10px 0 0; color: #526d83; font-size: 12px; line-height: 1.5; }
+    .hunt-list { display: grid; gap: 8px; margin: 13px 0 0; padding: 0; list-style: none; }
+    .hunt-task { display: flex; width: 100%; justify-content: space-between; gap: 10px; text-align: left; }
+    .hunt-task:disabled { cursor: default; opacity: .7; }
+    .climate-tabs { display: flex; gap: 8px; margin: 13px 0 10px; }
+    .climate-tab[aria-pressed="true"] { border-color: #286bb4; background: #eaf4fc; color: #174f86; }
+
+    .section { margin-top: 27px; }
+    .section-heading { margin-bottom: 13px; }
+    h2 { margin: 0; color: #203c55; font-size: 17px; letter-spacing: -.015em; }
+    .section-note { color: var(--muted); font-size: 12px; }
+
+    .hourly {
+      display: grid;
+      grid-auto-columns: minmax(105px, 1fr);
+      grid-auto-flow: column;
+      gap: 9px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-color: #c9d8e5 transparent;
+    }
+    .hour {
+      min-width: 105px;
+      padding: 16px 12px 14px;
+      text-align: center;
+    }
+    .hour-time { color: #647a8d; font-size: 12px; }
+    .hour-icon { margin: 13px 0 8px; font-size: 26px; }
+    .hour-temp { color: #18364f; font-size: 21px; font-weight: 700; letter-spacing: -.04em; }
+    .hour-rain { min-height: 16px; margin-top: 7px; color: #5182ad; font-size: 11px; }
+
+    .daily { overflow: hidden; }
+    .day-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1.2fr) minmax(80px, .8fr) minmax(100px, 1fr) minmax(100px, 1.1fr);
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .day-row:last-child { border-bottom: 0; }
+    .day-name { color: #24435e; font-size: 13px; font-weight: 700; }
+    .day-symbol { margin-right: 7px; font-size: 19px; vertical-align: -3px; }
+    .day-temp { color: #25435b; font-size: 13px; font-weight: 700; }
+    .day-temp span { margin-left: 5px; color: #7b8e9f; font-weight: 500; }
+    .day-condition { color: #62798d; font-size: 12px; }
+    .day-rain { color: #5482a9; font-size: 12px; text-align: right; }
+
+    .radar-card { overflow: hidden; }
+    .radar-frame {
+      display: block;
+      width: 100%;
+      height: 440px;
+      border: 0;
+      background: #e8f1f7;
+    }
+    .radar-link { color: #517b9e; font-size: 12px; text-decoration: none; }
+    .radar-link:hover { text-decoration: underline; }
+
+    .quiz-card { padding: 22px; }
+    .quiz-status { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+    .quiz-question { margin: 18px 0 14px; color: #203c55; font-size: 19px; font-weight: 700; }
+    .quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .quiz-option {
+      padding: 12px 14px;
+      border: 1px solid #d8e5f0;
+      border-radius: 11px;
+      background: white;
+      color: #315777;
+      cursor: pointer;
+      text-align: left;
+    }
+    .quiz-option:hover:not(:disabled) { border-color: #8ab5d7; background: #f5faff; }
+    .quiz-option:focus-visible, .quiz-action:focus-visible { outline: 3px solid #8ab5d7; outline-offset: 2px; }
+    .quiz-option:disabled { cursor: default; opacity: 1; }
+    .quiz-option.correct { border-color: #8ac6a0; background: #eff9f2; color: #28613a; }
+    .quiz-option.incorrect { border-color: #e4a5a0; background: #fff4f2; color: #8a342d; }
+    .quiz-feedback { min-height: 24px; margin: 14px 0; color: #526d83; font-size: 13px; line-height: 1.5; }
+    .quiz-action {
+      padding: 9px 13px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--blue);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .quiz-action:hover { background: #205a96; }
+
+    .fleet-card { padding: 22px; }
+    .fleet-intro { margin: 0 0 16px; color: #61778b; font-size: 13px; line-height: 1.5; }
+    .fleet-status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 16px; color: #526d83; font-size: 13px; }
+    .fleet-board-wrap { overflow-x: auto; padding: 2px; }
+    .fleet-board {
+      display: grid;
+      grid-template-columns: 30px repeat(8, minmax(30px, 1fr));
+      gap: 5px;
+      width: min(100%, 470px);
+      margin: 0 auto;
+    }
+    .fleet-axis { display: grid; min-height: 38px; place-items: center; color: #61778b; font-size: 12px; font-weight: 700; }
+    .fleet-cell {
+      display: grid;
+      min-width: 0;
+      aspect-ratio: 1;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #cbddea;
+      border-radius: 8px;
+      background: #edf6fc;
+      color: #315777;
+      cursor: pointer;
+      font-size: clamp(15px, 4vw, 21px);
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    .fleet-cell:hover:not(:disabled) { transform: translateY(-1px); border-color: #7eafd2; background: #dceef9; }
+    .fleet-cell:focus-visible, .fleet-restart:focus-visible { outline: 3px solid #8ab5d7; outline-offset: 2px; }
+    .fleet-cell:disabled { cursor: default; }
+    .fleet-cell.hit { border-color: #e39a77; background: #fff0e8; }
+    .fleet-cell.miss { border-color: #d8e5f0; background: #f7fafc; color: #8298aa; }
+    .fleet-feedback { min-height: 23px; margin: 14px 0; color: #526d83; font-size: 13px; }
+    .fleet-restart { padding: 9px 13px; border: 0; border-radius: 10px; background: var(--blue); color: white; cursor: pointer; font-size: 13px; font-weight: 650; }
+    .fleet-restart:hover { background: #205a96; }
+
+    .forecast-game { padding: 22px; }
+    .forecast-game-intro { margin: 0 0 16px; color: #61778b; font-size: 13px; line-height: 1.5; }
+    .forecast-game-status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 16px; color: #526d83; font-size: 13px; }
+    .forecast-table { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+    .forecast-pile {
+      display: flex;
+      min-height: 115px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 12px;
+      border: 1px solid #e3edf5;
+      border-radius: 14px;
+      background: #f8fbfe;
+      color: #61778b;
+      font-size: 12px;
+    }
+    .forecast-card {
+      display: grid;
+      width: 70px;
+      height: 96px;
+      place-items: center;
+      padding: 0;
+      border: 2px solid rgba(255,255,255,.85);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(24, 54, 79, .13);
+      color: white;
+      font-size: 27px;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0,0,0,.25);
+    }
+    .forecast-card-small { width: 58px; height: 78px; flex: none; font-size: 22px; }
+    .forecast-card.sun { background: linear-gradient(145deg, #e6a42b, #cb711f); }
+    .forecast-card.rain { background: linear-gradient(145deg, #4199c7, #24618f); }
+    .forecast-card.wind { background: linear-gradient(145deg, #43a68d, #26735f); }
+    .forecast-card.snow { background: linear-gradient(145deg, #839ec9, #536a9c); }
+    .forecast-card.wild { background: linear-gradient(135deg, #e8a332 0 25%, #4199c7 25% 50%, #43a68d 50% 75%, #839ec9 75%); }
+    .forecast-card.back { background: repeating-linear-gradient(135deg, #174f86 0 8px, #2878b9 8px 16px); }
+    .forecast-discard { min-width: 76px; min-height: 100px; display: grid; place-items: center; }
+    .forecast-hand-title { margin: 18px 0 10px; color: #315777; font-size: 13px; font-weight: 700; }
+    .forecast-hand {
+      display: flex;
+      min-height: 112px;
+      gap: 8px;
+      overflow-x: auto;
+      align-items: flex-start;
+      padding: 4px 3px 10px;
+    }
+    .forecast-hand .forecast-card {
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .forecast-hand .forecast-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 7px 14px rgba(24, 54, 79, .2); }
+    .forecast-hand .forecast-card:disabled { cursor: default; opacity: .45; }
+    .forecast-card:focus-visible, .forecast-control:focus-visible, .forecast-suit:focus-visible { outline: 3px solid #8ab5d7; outline-offset: 3px; }
+    .forecast-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .forecast-control, .forecast-suit {
+      padding: 9px 13px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--blue);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .forecast-control:disabled { cursor: default; opacity: .5; }
+    .forecast-control:hover:not(:disabled), .forecast-suit:hover { background: #205a96; }
+    .forecast-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .forecast-choice-label { width: 100%; color: #526d83; font-size: 13px; }
+    .forecast-suit.sun { background: #c8791f; }
+    .forecast-suit.rain { background: #24618f; }
+    .forecast-suit.wind { background: #26735f; }
+    .forecast-suit.snow { background: #536a9c; }
+    .forecast-feedback { min-height: 23px; margin: 13px 0; color: #526d83; font-size: 13px; line-height: 1.5; }
+    .forecast-rule-note { margin: 15px 0 0; color: #71869a; font-size: 11px; line-height: 1.5; }
+
+    .error {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid #f2c9c5;
+      border-radius: 12px;
+      background: #fff5f3;
+      color: #8a342d;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    [hidden] { display: none !important; }
+
+    .footer { margin-top: 24px; color: #7a8d9d; font-size: 11px; line-height: 1.5; }
+    .footer a { color: #517b9e; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 620px) {
+      .page { width: min(100% - 24px, 520px); padding-top: 18px; }
+      .heading { margin-top: 28px; align-items: flex-start; flex-direction: column; gap: 10px; }
+      .location-controls { width: 100%; }
+      .location-select { flex: 1; min-width: 135px; }
+      .location-input { flex: 1; min-width: 120px; }
+      .current { min-height: 260px; padding: 23px 20px; }
+      .current-main { gap: 9px; margin-top: 28px; }
+      .weather-symbol { width: 68px; font-size: 56px; }
+      .current-details { gap: 6px; }
+      .detail-pill { padding: 6px 8px; font-size: 11px; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .metric { padding: 12px; }
+      .learning-grid { grid-template-columns: 1fr; }
+      .learning-card { padding: 16px; }
+      .day-row { grid-template-columns: minmax(105px, 1.2fr) 75px 1fr; gap: 7px; padding: 13px 11px; }
+      .day-condition { display: none; }
+      .day-rain { font-size: 11px; }
+      .radar-frame { height: 360px; }
+      .quiz-card { padding: 17px; }
+      .quiz-options { grid-template-columns: 1fr; }
+      .fleet-card { padding: 16px 11px; }
+      .fleet-board { grid-template-columns: 23px repeat(8, minmax(28px, 1fr)); gap: 4px; }
+      .fleet-axis { min-height: 34px; }
+      .forecast-game { padding: 16px 12px; }
+      .forecast-pile { min-height: 100px; padding: 8px; }
+      .forecast-card { width: 62px; height: 86px; }
+      .forecast-card-small { width: 52px; height: 72px; }
+      .forecast-discard { min-width: 62px; min-height: 88px; }
+      .forecast-hand { min-height: 100px; }
+      .footer { align-items: flex-start; flex-direction: column; gap: 7px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">☀</span> Local weather</div>
+      <button class="refresh" id="refresh" type="button"><span aria-hidden="true">↻</span> Refresh</button>
+    </header>
+
+    <section class="heading" aria-label="Location">
+      <div>
+        <h1 id="location-title">Marshall, Texas</h1>
+        <p class="subtitle" id="location-subtitle">Your local forecast, from the National Weather Service</p>
+      </div>
+      <div class="location-controls" aria-label="Location and display settings">
+        <select class="location-select" id="location-select" aria-label="Saved locations"></select>
+        <button class="location-button" id="remove-location" type="button">Remove</button>
+        <input class="location-input" id="location-search" type="search" placeholder="Add a city" aria-label="Search for a city">
+        <button class="location-button" id="search-location" type="button">Find</button>
+        <button class="unit-toggle" id="unit-toggle" type="button" aria-label="Switch temperature units">°F</button>
+      </div>
+    </section>
+
+    <div class="location-search-results" id="location-results" aria-live="polite"></div>
+    <p class="location-feedback" id="location-feedback" aria-live="polite"></p>
+
+    <section class="section alert-list" id="alerts" aria-label="Active weather alerts" hidden></section>
+
+    <section class="card current" aria-label="Current hourly forecast">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">Current outlook</p>
+          <p class="updated" id="updated">Loading the latest forecast…</p>
+        </div>
+      </div>
+      <div class="current-main">
+        <div class="weather-symbol" id="main-icon" aria-hidden="true">⛅</div>
+        <div>
+          <div class="temperature" id="main-temp">--°</div>
+          <p class="condition" id="main-condition">Fetching Marshall's forecast</p>
+        </div>
+      </div>
+      <div class="current-details" id="current-details"></div>
+    </section>
+
+    <section class="section" aria-label="Additional weather details">
+      <div class="metrics">
+        <article class="card metric"><div class="metric-label">Feels like</div><div class="metric-value" id="feels-like">—</div><div class="metric-note" id="humidity">Humidity —</div></article>
+        <article class="card metric"><div class="metric-label">Wind gusts</div><div class="metric-value" id="wind-gusts">—</div><div class="metric-note">Peak current gust</div></article>
+        <article class="card metric"><div class="metric-label">UV index</div><div class="metric-value" id="uv-index">—</div><div class="metric-note" id="uv-note">Current UV exposure</div></article>
+        <article class="card metric"><div class="metric-label">Air quality</div><div class="metric-value" id="air-quality">—</div><div class="metric-note" id="air-quality-note">US AQI</div></article>
+        <article class="card metric"><div class="metric-label">Sunrise</div><div class="metric-value" id="sunrise">—</div><div class="metric-note" id="sunset">Sunset —</div></article>
+        <article class="card metric"><div class="metric-label">Rain timing</div><div class="metric-value" id="rain-timing">—</div><div class="metric-note" id="rain-timing-note">Next 24 hours</div></article>
+      </div>
+    </section>
+
+    <div class="error" id="error" role="alert" hidden></div>
+
+    <section class="section" aria-labelledby="hourly-title">
+      <div class="section-heading">
+        <h2 id="hourly-title">The next hours</h2>
+        <span class="section-note">Hourly forecast</span>
+      </div>
+      <div class="hourly" id="hourly" aria-live="polite"></div>
+    </section>
+
+    <section class="section" aria-labelledby="daily-title">
+      <div class="section-heading">
+        <h2 id="daily-title">The week ahead</h2>
+        <span class="section-note">Daytime forecast</span>
+      </div>
+      <div class="card daily" id="daily" aria-live="polite"></div>
+    </section>
+
+    <section class="section" aria-labelledby="learn-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="learn-title">Weather learning lab</h2>
+          <span class="section-note">A little weather science and safety each day</span>
+        </div>
+      </div>
+      <div class="learning-grid">
+        <article class="card learning-card">
+          <p class="learning-kicker">Fact of the day</p>
+          <h3 id="weather-fact-title"></h3>
+          <p class="learning-copy" id="weather-fact-copy"></p>
+          <div class="learning-actions">
+            <button class="learning-button" id="next-weather-fact" type="button">Another fact</button>
+          </div>
+        </article>
+        <article class="card learning-card">
+          <p class="learning-kicker">Storm safety challenge</p>
+          <h3 id="safety-question">A tornado warning has been issued for your area. Where is the safest place to go?</h3>
+          <div class="safety-answers" id="safety-answers"></div>
+          <p class="learning-feedback" id="safety-feedback" aria-live="polite"></p>
+          <button class="learning-button" id="safety-reset" type="button" hidden>Try again</button>
+        </article>
+        <article class="card learning-card">
+          <p class="learning-kicker">Radar scavenger hunt</p>
+          <h3>What can you spot near Marshall?</h3>
+          <p class="learning-copy">Open the live radar, look carefully, then mark each observation you can make. Radar shows precipitation, not every kind of cloud or weather.</p>
+          <div class="learning-actions">
+            <a class="learning-button" href="#radar-title">Go to local radar ↓</a>
+          </div>
+          <ul class="hunt-list" id="radar-hunt"></ul>
+          <p class="learning-feedback" id="radar-hunt-progress" aria-live="polite"></p>
+          <button class="learning-button" id="radar-hunt-reset" type="button">Reset hunt</button>
+        </article>
+        <article class="card learning-card">
+          <p class="learning-kicker">Weather or climate?</p>
+          <h3 id="climate-title">Weather describes what is happening now.</h3>
+          <div class="climate-tabs" role="group" aria-label="Choose weather or climate">
+            <button class="climate-tab" id="weather-tab" type="button" aria-pressed="true">Weather</button>
+            <button class="climate-tab" id="climate-tab" type="button" aria-pressed="false">Climate</button>
+          </div>
+          <p class="learning-copy" id="climate-copy"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="quiz-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="quiz-title">Marshall &amp; East Texas trivia</h2>
+          <span class="section-note">Test your local knowledge</span>
+        </div>
+      </div>
+      <div class="card quiz-card">
+        <div class="quiz-status">
+          <span id="quiz-progress">Question 1 of 5</span>
+          <span id="quiz-score">Score: 0</span>
+        </div>
+        <p class="quiz-question" id="quiz-question"></p>
+        <div class="quiz-options" id="quiz-options"></div>
+        <p class="quiz-feedback" id="quiz-feedback" aria-live="polite"></p>
+        <button class="quiz-action" id="quiz-action" type="button" hidden></button>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="forecast-game-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="forecast-game-title">Forecast Flip</h2>
+          <span class="section-note">A weather-themed card game</span>
+        </div>
+      </div>
+      <div class="card forecast-game">
+        <p class="forecast-game-intro">Play cards that match the weather suit or symbol. First to empty their hand wins. Use a wild to change the forecast!</p>
+        <div class="forecast-game-status">
+          <span id="forecast-computer-count">Computer: 7 cards</span>
+          <span id="forecast-player-count">Your hand: 7 cards</span>
+        </div>
+        <div class="forecast-table">
+          <div class="forecast-pile">
+            <span>Computer hand</span>
+            <div id="forecast-computer-hand" aria-label="Computer card count"></div>
+          </div>
+          <div class="forecast-pile">
+            <span>Current forecast</span>
+            <div class="forecast-discard" id="forecast-discard"></div>
+            <span id="forecast-suit-label"></span>
+          </div>
+        </div>
+        <p class="forecast-feedback" id="forecast-feedback" aria-live="polite">Deal the cards to start.</p>
+        <div class="forecast-choice" id="forecast-choice" hidden></div>
+        <h3 class="forecast-hand-title" id="forecast-hand-title">Your weather hand</h3>
+        <div class="forecast-hand" id="forecast-hand" aria-label="Your cards"></div>
+        <div class="forecast-actions">
+          <button class="forecast-control" id="forecast-draw" type="button">Draw a card</button>
+          <button class="forecast-control" id="forecast-pass" type="button" hidden>Pass turn</button>
+          <button class="forecast-control" id="forecast-new" type="button">New game</button>
+        </div>
+        <p class="forecast-rule-note">Weather suits: ☀️ Sun · 🌧️ Rain · 💨 Wind · ❄️ Snow. Skip and Reverse skip the computer; +2 and +4 make it draw and lose its turn. Draw one card if you can't play, then play it if it fits or pass.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="fleet-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="fleet-title">Storm Fleet</h2>
+          <span class="section-note">A weather-inspired fleet hunt</span>
+        </div>
+      </div>
+      <div class="card fleet-card">
+        <p class="fleet-intro">Find the hidden storm systems on the map. The fleet has 3 vessels: one 3-cell storm and two 2-cell fronts. Choose a square to scan it.</p>
+        <div class="fleet-status">
+          <span id="fleet-ships">Storm systems found: 0 of 3</span>
+          <span id="fleet-turns">Scans: 0</span>
+        </div>
+        <div class="fleet-board-wrap">
+          <div class="fleet-board" id="fleet-board" role="grid" aria-label="Storm Fleet search grid"></div>
+        </div>
+        <p class="fleet-feedback" id="fleet-feedback" aria-live="polite">Choose a square to begin your search.</p>
+        <button class="fleet-restart" id="fleet-restart" type="button">New game</button>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="radar-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="radar-title">Weather radar</h2>
+          <span class="section-note">Live precipitation near Marshall, Texas</span>
+        </div>
+        <a class="radar-link" href="https://www.windy.com/32.5449/-94.3674?radar,32.5449,-94.3674,8" target="_blank" rel="noreferrer">Open full radar ↗</a>
+      </div>
+      <div class="card radar-card">
+        <iframe
+          class="radar-frame"
+          title="Interactive precipitation radar centered on Marshall, Texas"
+          src="https://embed.windy.com/embed2.html?lat=32.5449&amp;lon=-94.3674&amp;detailLat=32.5449&amp;detailLon=-94.3674&amp;width=650&amp;height=450&amp;zoom=8&amp;level=surface&amp;overlay=radar&amp;product=radar&amp;menu=&amp;message=true&amp;marker=true&amp;calendar=now&amp;pressure=true&amp;type=map&amp;location=coordinates&amp;detail=&amp;metricWind=mph&amp;metricTemp=%C2%B0F"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Forecast data provided by the <a href="https://www.weather.gov/" target="_blank" rel="noreferrer">National Weather Service</a>.</span>
+      <span>Additional conditions and air quality by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>.</span>
+      <span id="office"></span>
+    </footer>
+  </main>
+
+  <script>
+    const MARSHALL = { latitude: 32.5449, longitude: -94.3674 };
+    const DEFAULT_LOCATIONS = [
+      { name: "Marshall", admin: "Texas", country: "US", latitude: MARSHALL.latitude, longitude: MARSHALL.longitude },
+      { name: "Longview", admin: "Texas", country: "US", latitude: 32.5007, longitude: -94.7405 },
+      { name: "Jefferson", admin: "Texas", country: "US", latitude: 32.7574, longitude: -94.3452 },
+      { name: "Texarkana", admin: "Texas", country: "US", latitude: 33.4251, longitude: -94.0477 },
+      { name: "Shreveport", admin: "Louisiana", country: "US", latitude: 32.5252, longitude: -93.7502 }
+    ];
+    const STORAGE_KEYS = {
+      locations: "marshall-weather.locations",
+      selected: "marshall-weather.selected",
+      units: "marshall-weather.units"
+    };
+    let locations = [...DEFAULT_LOCATIONS];
+    let selectedLocation = locations[0];
+    let temperatureUnit = "F";
+    let savedSupplementaryData = null;
+    let savedHourlyForecast = [];
+    let forecastLoadId = 0;
+    const hourlyContainer = document.getElementById("hourly");
+    const dailyContainer = document.getElementById("daily");
+    const errorBox = document.getElementById("error");
+    const refreshButton = document.getElementById("refresh");
+    const locationSelect = document.getElementById("location-select");
+    const locationSearch = document.getElementById("location-search");
+    const locationResults = document.getElementById("location-results");
+    const locationFeedback = document.getElementById("location-feedback");
+    const unitToggle = document.getElementById("unit-toggle");
+    const alertsContainer = document.getElementById("alerts");
+    const weatherFacts = [
+      ["Clouds have different stories", "Tall, puffy cumulonimbus clouds can grow into thunderstorms. Flat, layered stratus clouds often bring gray skies and sometimes drizzle."],
+      ["Lightning heats the air", "A lightning channel heats nearby air extremely quickly. The rapid expansion creates the sound wave we hear as thunder."],
+      ["Raindrops are not teardrop-shaped", "Small raindrops are nearly spherical. Larger drops flatten at the bottom as they fall and may split apart."],
+      ["Doppler radar tracks motion", "Doppler weather radar uses changes in reflected radio waves to estimate whether precipitation is moving toward or away from the radar."],
+      ["A front is a boundary", "A weather front is the boundary between air masses with different temperatures and moisture. Passing fronts can change wind, clouds, and rain."],
+      ["Humidity is about water vapor", "Relative humidity compares the water vapor in the air with the maximum it could hold at that temperature. Warm air can hold more vapor than cold air."],
+      ["Thunder can travel far", "You can hear thunder from many miles away, but buildings and terrain affect how far it carries. If you hear thunder, go indoors."],
+      ["The seasons come from Earth's tilt", "Earth's tilted axis changes how directly sunlight reaches each hemisphere through the year. Seasons are not caused by Earth being much closer to the Sun."],
+      ["Dew point tells us about moisture", "Dew point is the temperature air would need to cool to for water vapor to begin condensing. A higher dew point usually means more moisture in the air."],
+      ["Tornado watches and warnings differ", "A watch means conditions could support tornadoes. A warning means a tornado has been indicated or spotted and people in the warned area should take shelter."],
+      ["Rain is only one kind of precipitation", "Precipitation includes water falling from clouds as rain, snow, sleet, or freezing rain."],
+      ["East Texas gets Gulf moisture", "Moist air from the Gulf of Mexico often contributes to East Texas humidity and can help fuel showers and thunderstorms."]
+    ];
+    let weatherFactIndex = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000) % weatherFacts.length;
+    const safetyOptions = [
+      "Go to a basement or a small interior room on the lowest floor, away from windows.",
+      "Stand by a window so you can watch the storm.",
+      "Take shelter under an overpass."
+    ];
+    const radarHuntTasks = [
+      "Find the Marshall marker or map location.",
+      "Check whether any precipitation is near Marshall.",
+      "Look for a precipitation area and note its direction of movement.",
+      "Compare the radar view with the forecast above."
+    ];
+    const safetyAnswers = document.getElementById("safety-answers");
+    const safetyFeedback = document.getElementById("safety-feedback");
+    const safetyReset = document.getElementById("safety-reset");
+    const radarHunt = document.getElementById("radar-hunt");
+    let safetyAnswered = false;
+    let radarHuntComplete = 0;
+    const quizQuestions = [
+      {
+        question: "Marshall is the county seat of which Texas county?",
+        options: ["Harrison County", "Gregg County", "Panola County", "Rusk County"],
+        answer: 0,
+        explanation: "Marshall is the county seat of Harrison County."
+      },
+      {
+        question: "In which region of Texas is Marshall located?",
+        options: ["West Texas", "South Texas", "East Texas", "The Panhandle"],
+        answer: 2,
+        explanation: "Marshall is in East Texas."
+      },
+      {
+        question: "Which state borders Texas to the east?",
+        options: ["Oklahoma", "Louisiana", "New Mexico", "Arkansas"],
+        answer: 1,
+        explanation: "Louisiana lies east of Texas; the Sabine River marks much of their border."
+      },
+      {
+        question: "Which river forms much of the Texas–Louisiana border?",
+        options: ["Brazos River", "Red River", "Trinity River", "Sabine River"],
+        answer: 3,
+        explanation: "The Sabine River forms a large part of the Texas–Louisiana boundary."
+      },
+      {
+        question: "What is the capital of Texas?",
+        options: ["Houston", "Dallas", "Austin", "San Antonio"],
+        answer: 2,
+        explanation: "Austin is the capital of Texas."
+      }
+    ];
+    let quizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+    const quizProgress = document.getElementById("quiz-progress");
+    const quizScoreLabel = document.getElementById("quiz-score");
+    const quizQuestion = document.getElementById("quiz-question");
+    const quizOptions = document.getElementById("quiz-options");
+    const quizFeedback = document.getElementById("quiz-feedback");
+    const quizAction = document.getElementById("quiz-action");
+    const fleetBoardElement = document.getElementById("fleet-board");
+    const fleetShipsLabel = document.getElementById("fleet-ships");
+    const fleetTurnsLabel = document.getElementById("fleet-turns");
+    const fleetFeedback = document.getElementById("fleet-feedback");
+    const fleetRestartButton = document.getElementById("fleet-restart");
+    const fleetSize = 8;
+    const fleetRows = "ABCDEFGH";
+    const weatherFleet = [
+      { name: "Thunderstorm", length: 3, icon: "⛈️", hits: 0, sunk: false },
+      { name: "Rain band", length: 2, icon: "🌧️", hits: 0, sunk: false },
+      { name: "Cold front", length: 2, icon: "❄️", hits: 0, sunk: false }
+    ];
+    let fleetCells = [];
+    let fleetShots = 0;
+    let fleetGameOver = false;
+    const forecastSuits = [
+      { id: "sun", name: "Sun", icon: "☀️" },
+      { id: "rain", name: "Rain", icon: "🌧️" },
+      { id: "wind", name: "Wind", icon: "💨" },
+      { id: "snow", name: "Snow", icon: "❄️" }
+    ];
+    const forecastComputerCount = document.getElementById("forecast-computer-count");
+    const forecastPlayerCount = document.getElementById("forecast-player-count");
+    const forecastComputerHand = document.getElementById("forecast-computer-hand");
+    const forecastDiscard = document.getElementById("forecast-discard");
+    const forecastSuitLabel = document.getElementById("forecast-suit-label");
+    const forecastFeedback = document.getElementById("forecast-feedback");
+    const forecastChoice = document.getElementById("forecast-choice");
+    const forecastHand = document.getElementById("forecast-hand");
+    const forecastDrawButton = document.getElementById("forecast-draw");
+    const forecastPassButton = document.getElementById("forecast-pass");
+    const forecastNewButton = document.getElementById("forecast-new");
+    const forecastPlayers = [[], []];
+    let forecastDeck = [];
+    let forecastDiscardPile = [];
+    let forecastCurrentSuit = "";
+    let forecastTurn = 0;
+    let forecastGameOver = false;
+    let forecastDrewCardId = null;
+    let forecastPendingWildIndex = null;
+    let forecastAITimer = null;
+    let forecastCardId = 0;
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function weatherIcon(text) {
+      const condition = (text || "").toLowerCase();
+      if (/thunder|storm/.test(condition)) return "⛈️";
+      if (/snow|flurr|blizzard|sleet|ice/.test(condition)) return "❄️";
+      if (/rain|shower|drizzle/.test(condition)) return "🌧️";
+      if (/fog|haze|smoke/.test(condition)) return "🌫️";
+      if (/cloud|overcast/.test(condition)) return /partly|mostly|some/.test(condition) ? "⛅" : "☁️";
+      if (/clear|sunny|fair/.test(condition)) return "☀️";
+      return "🌤️";
+    }
+
+    function getTemperature(period) {
+      return period.temperature === null || period.temperature === undefined
+        ? "—"
+        : `${convertTemperature(period.temperature, period.temperatureUnit || "F")}°${temperatureUnit}`;
+    }
+
+    function convertTemperature(value, fromUnit = "F") {
+      const temperature = Number(value);
+      if (!Number.isFinite(temperature)) return "—";
+      if (fromUnit.toUpperCase().startsWith(temperatureUnit)) return Math.round(temperature);
+      return Math.round(temperatureUnit === "C" ? (temperature - 32) * 5 / 9 : temperature * 9 / 5 + 32);
+    }
+
+    function formatWind(value) {
+      if (!value) return "—";
+      return value.replace(/(\d+(?:\.\d+)?)\s*mph/gi, (_, speed) =>
+        `${Math.round(temperatureUnit === "C" ? Number(speed) * 1.60934 : Number(speed))} ${temperatureUnit === "C" ? "km/h" : "mph"}`
+      );
+    }
+
+    function formatClock(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime())
+        ? "—"
+        : new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(date);
+    }
+
+    function locationName(location) {
+      return `${location.name}, ${location.admin || location.country || ""}`.replace(/,\s*$/, "");
+    }
+
+    function locationKey(location) {
+      return `${location.latitude.toFixed(3)},${location.longitude.toFixed(3)}`;
+    }
+
+    function loadPreferences() {
+      try {
+        const storedLocations = JSON.parse(localStorage.getItem(STORAGE_KEYS.locations) || "null");
+        if (Array.isArray(storedLocations)) {
+          locations = [];
+          for (const saved of storedLocations) {
+            if (saved && typeof saved.name === "string" &&
+              Number.isFinite(saved.latitude) && Number.isFinite(saved.longitude) &&
+              !locations.some(location => locationKey(location) === locationKey(saved))) {
+              locations.push(saved);
+            }
+          }
+          if (!locations.some(location => locationKey(location) === locationKey(DEFAULT_LOCATIONS[0]))) {
+            locations.unshift(DEFAULT_LOCATIONS[0]);
+          }
+          if (!locations.length) locations = [...DEFAULT_LOCATIONS];
+        }
+        const storedUnit = localStorage.getItem(STORAGE_KEYS.units);
+        if (storedUnit === "C" || storedUnit === "F") temperatureUnit = storedUnit;
+        const selectedKey = localStorage.getItem(STORAGE_KEYS.selected);
+        selectedLocation = locations.find(location => locationKey(location) === selectedKey) || locations[0];
+      } catch (error) {
+        locationFeedback.textContent = `Saved preferences could not be read: ${error.message}`;
+      }
+    }
+
+    function savePreference(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (error) {
+        locationFeedback.textContent = `This change is temporary; browser storage failed: ${error.message}`;
+        return false;
+      }
+    }
+
+    function saveLocations() {
+      return savePreference(STORAGE_KEYS.locations, JSON.stringify(locations));
+    }
+
+    function renderLocationControls() {
+      locationSelect.replaceChildren();
+      locations.forEach(location => {
+        const option = makeElement("option", "", locationName(location));
+        option.value = locationKey(location);
+        option.selected = locationKey(location) === locationKey(selectedLocation);
+        locationSelect.append(option);
+      });
+      unitToggle.textContent = `°${temperatureUnit}`;
+      unitToggle.setAttribute("aria-label", `Switch to ${temperatureUnit === "F" ? "Celsius" : "Fahrenheit"}`);
+      document.getElementById("location-title").textContent = locationName(selectedLocation);
+      document.getElementById("location-subtitle").textContent =
+        `Your local forecast, from the National Weather Service · ${temperatureUnit === "F" ? "Fahrenheit" : "Celsius"}`;
+      document.getElementById("remove-location").disabled =
+        locationKey(selectedLocation) === locationKey(DEFAULT_LOCATIONS[0]);
+    }
+
+    function renderAlerts(alerts, errorMessage = "") {
+      alertsContainer.replaceChildren();
+      alertsContainer.hidden = false;
+      if (errorMessage) {
+        const card = makeElement("article", "alert-card");
+        card.append(makeElement("h2", "", "Weather alerts unavailable"));
+        card.append(makeElement("p", "", errorMessage));
+        alertsContainer.append(card);
+        return;
+      }
+      if (!alerts.length) {
+        alertsContainer.append(makeElement("article", "alert-card", `No active NWS alerts for ${locationName(selectedLocation)}.`));
+        return;
+      }
+      for (const alert of alerts) {
+        const properties = alert.properties;
+        const severity = (properties.severity || "").toLowerCase();
+        const card = makeElement("article", `alert-card ${severity === "extreme" || severity === "severe" ? "warning" : severity === "moderate" ? "watch" : ""}`);
+        const title = makeElement("h2", "", `${properties.event || "Weather alert"} · ${properties.headline || properties.areaDesc || ""}`);
+        const description = makeElement("p", "", properties.description || properties.instruction || "See the NWS alert for details.");
+        card.append(title, description);
+        if (properties.ends) {
+          card.append(makeElement("p", "", `Expires ${formatTime(properties.ends, {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+          })} local time.`));
+        }
+        alertsContainer.append(card);
+      }
+    }
+
+    function renderSupplementary(weather, air) {
+      const current = weather && weather.current;
+      const airCurrent = air && air.current;
+      const humidity = current && current.relative_humidity_2m;
+      const feelsLike = current && current.apparent_temperature;
+      const gust = current && current.wind_gusts_10m;
+      const uv = current && current.uv_index;
+      document.getElementById("feels-like").textContent =
+        Number.isFinite(feelsLike) ? `${Math.round(feelsLike)}°${temperatureUnit}` : "Unavailable";
+      document.getElementById("humidity").textContent =
+        Number.isFinite(humidity) ? `Humidity ${Math.round(humidity)}%` : "Humidity unavailable";
+      document.getElementById("wind-gusts").textContent =
+        Number.isFinite(gust) ? `${Math.round(gust)} ${temperatureUnit === "F" ? "mph" : "km/h"}` : "Unavailable";
+      document.getElementById("uv-index").textContent =
+        Number.isFinite(uv) ? uv.toFixed(1) : "Unavailable";
+      document.getElementById("uv-note").textContent = Number.isFinite(uv)
+        ? uv >= 11 ? "Extreme exposure" : uv >= 8 ? "Very high exposure" : uv >= 6 ? "High exposure" : uv >= 3 ? "Moderate exposure" : "Low exposure"
+        : "Current UV unavailable";
+
+      const aqi = airCurrent && airCurrent.us_aqi;
+      document.getElementById("air-quality").textContent =
+        Number.isFinite(aqi) ? `${Math.round(aqi)} AQI` : "Unavailable";
+      document.getElementById("air-quality-note").textContent = Number.isFinite(aqi)
+        ? aqi <= 50 ? "Good" : aqi <= 100 ? "Moderate" : aqi <= 150 ? "Unhealthy for sensitive groups" : aqi <= 200 ? "Unhealthy" : aqi <= 300 ? "Very unhealthy" : "Hazardous"
+        : "US AQI unavailable";
+
+      const sunrise = weather && weather.daily && weather.daily.sunrise && weather.daily.sunrise[0];
+      const sunset = weather && weather.daily && weather.daily.sunset && weather.daily.sunset[0];
+      document.getElementById("sunrise").textContent = formatClock(sunrise);
+      document.getElementById("sunset").textContent = `Sunset ${formatClock(sunset)}`;
+
+      savedSupplementaryData = { current };
+      savedHourlyForecast = weather && weather.hourly ? weather.hourly : [];
+      renderRainTiming();
+    }
+
+    function renderRainTiming() {
+      const timeSeries = savedHourlyForecast.time || [];
+      const precipitation = savedHourlyForecast.precipitation || [];
+      const probability = savedHourlyForecast.precipitation_probability || [];
+      const now = Date.now();
+      const upcoming = timeSeries.map((time, index) => ({
+        time: new Date(time),
+        wet: (Number(probability[index]) >= 35) || (Number(precipitation[index]) >= 0.1)
+      })).filter(item => item.time.getTime() >= now && item.time.getTime() <= now + 24 * 60 * 60 * 1000);
+      const firstWet = upcoming.findIndex(item => item.wet);
+      const label = document.getElementById("rain-timing");
+      const note = document.getElementById("rain-timing-note");
+      if (firstWet < 0) {
+        label.textContent = "No rain expected";
+        note.textContent = "Next 24 hours";
+        return;
+      }
+      const lastWet = upcoming.findLastIndex ? upcoming.findLastIndex(item => item.wet) :
+        upcoming.reduce((last, item, index) => item.wet ? index : last, firstWet);
+      const starts = formatClock(upcoming[firstWet].time);
+      const ends = formatClock(new Date(upcoming[lastWet].time.getTime() + 60 * 60 * 1000));
+      label.textContent = firstWet === 0 ? "Rain possible now" : `Around ${starts}`;
+      note.textContent = `Expected through ${ends}`;
+    }
+
+    function formatTime(value, options) {
+      return new Intl.DateTimeFormat("en-US", options).format(new Date(value));
+    }
+
+    function renderWeatherFact() {
+      const [title, copy] = weatherFacts[weatherFactIndex];
+      document.getElementById("weather-fact-title").textContent = title;
+      document.getElementById("weather-fact-copy").textContent = copy;
+    }
+
+    function resetSafetyChallenge() {
+      safetyAnswered = false;
+      safetyFeedback.textContent = "";
+      safetyReset.hidden = true;
+      safetyAnswers.replaceChildren();
+      safetyOptions.forEach((option, index) => {
+        const button = makeElement("button", "safety-answer", option);
+        button.type = "button";
+        button.addEventListener("click", () => {
+          if (safetyAnswered) return;
+          safetyAnswered = true;
+          for (const [answerIndex, answerButton] of [...safetyAnswers.children].entries()) {
+            answerButton.disabled = true;
+            if (answerIndex === 0) answerButton.classList.add("correct");
+            else if (answerIndex === index) answerButton.classList.add("incorrect");
+          }
+          safetyFeedback.textContent = index === 0
+            ? "Correct. Protect your head and neck. Follow local officials and NWS instructions."
+            : "Not the safest choice. A basement or small interior room on the lowest floor, away from windows, is safer. Follow local officials and NWS instructions.";
+          safetyReset.hidden = false;
+        });
+        safetyAnswers.append(button);
+      });
+    }
+
+    function resetRadarHunt() {
+      radarHuntComplete = 0;
+      radarHunt.replaceChildren();
+      radarHuntTasks.forEach(task => {
+        const item = makeElement("li");
+        const button = makeElement("button", "hunt-task", task);
+        const status = makeElement("span", "", "Mark found");
+        button.type = "button";
+        button.append(status);
+        button.addEventListener("click", () => {
+          if (button.disabled) return;
+          button.disabled = true;
+          status.textContent = "✓ Found";
+          radarHuntComplete += 1;
+          document.getElementById("radar-hunt-progress").textContent =
+            `${radarHuntComplete} of ${radarHuntTasks.length} observations found.`;
+        });
+        item.append(button);
+        radarHunt.append(item);
+      });
+      document.getElementById("radar-hunt-progress").textContent =
+        `0 of ${radarHuntTasks.length} observations found.`;
+    }
+
+    function setClimateView(mode) {
+      const isWeather = mode === "weather";
+      document.getElementById("weather-tab").setAttribute("aria-pressed", String(isWeather));
+      document.getElementById("climate-tab").setAttribute("aria-pressed", String(!isWeather));
+      document.getElementById("climate-title").textContent = isWeather
+        ? "Weather describes what is happening now."
+        : "Climate describes long-term patterns.";
+      document.getElementById("climate-copy").textContent = isWeather
+        ? "A rainy afternoon in Marshall is weather: a short-term condition at a specific place and time."
+        : "Marshall's typical seasonal temperatures and rainfall patterns, measured over many years, are climate. A single storm or hot day does not define a climate.";
+    }
+
+    function renderQuizQuestion() {
+      const current = quizQuestions[quizIndex];
+      quizAnswered = false;
+      quizProgress.textContent = `Question ${quizIndex + 1} of ${quizQuestions.length}`;
+      quizScoreLabel.textContent = `Score: ${quizScore}`;
+      quizQuestion.textContent = current.question;
+      quizFeedback.textContent = "";
+      quizOptions.replaceChildren();
+      quizAction.hidden = true;
+
+      current.options.forEach((option, index) => {
+        const button = makeElement("button", "quiz-option", option);
+        button.type = "button";
+        button.addEventListener("click", () => answerQuizQuestion(index));
+        quizOptions.append(button);
+      });
+    }
+
+    function answerQuizQuestion(selectedIndex) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const current = quizQuestions[quizIndex];
+      const isCorrect = selectedIndex === current.answer;
+      if (isCorrect) quizScore += 1;
+      quizScoreLabel.textContent = `Score: ${quizScore}`;
+
+      for (const [index, button] of [...quizOptions.children].entries()) {
+        button.disabled = true;
+        if (index === current.answer) button.classList.add("correct");
+        else if (index === selectedIndex) button.classList.add("incorrect");
+      }
+      quizFeedback.textContent = `${isCorrect ? "Correct!" : "Not quite."} ${current.explanation}`;
+      quizAction.textContent = quizIndex === quizQuestions.length - 1 ? "See results" : "Next question";
+      quizAction.hidden = false;
+    }
+
+    function finishQuiz() {
+      quizProgress.textContent = "Quiz complete";
+      quizQuestion.textContent = `You scored ${quizScore} out of ${quizQuestions.length}!`;
+      quizOptions.replaceChildren();
+      quizFeedback.textContent = quizScore === quizQuestions.length
+        ? "Perfect score — you know your East Texas trivia!"
+        : "Give it another try and see if you can beat your score.";
+      quizAction.textContent = "Play again";
+      quizAction.hidden = false;
+    }
+
+    function advanceQuiz() {
+      if (quizIndex < quizQuestions.length - 1) {
+        quizIndex += 1;
+        renderQuizQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function restartQuiz() {
+      quizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+    }
+
+    function deployFleet() {
+      const cells = Array.from({ length: fleetSize }, () =>
+        Array.from({ length: fleetSize }, () => null)
+      );
+      for (const ship of weatherFleet) {
+        const placements = [];
+        for (let row = 0; row < fleetSize; row += 1) {
+          for (let column = 0; column < fleetSize; column += 1) {
+            for (const [rowStep, columnStep] of [[0, 1], [1, 0]]) {
+              const positions = Array.from({ length: ship.length }, (_, offset) => [
+                row + rowStep * offset,
+                column + columnStep * offset
+              ]);
+              if (positions.every(([r, c]) =>
+                r < fleetSize && c < fleetSize && cells[r][c] === null
+              )) {
+                placements.push(positions);
+              }
+            }
+          }
+        }
+        const placement = placements[Math.floor(Math.random() * placements.length)];
+        for (const [row, column] of placement) cells[row][column] = ship;
+        ship.hits = 0;
+        ship.sunk = false;
+      }
+      return cells;
+    }
+
+    function renderFleet() {
+      fleetBoardElement.replaceChildren();
+      const corner = makeElement("span", "fleet-axis");
+      corner.setAttribute("aria-hidden", "true");
+      fleetBoardElement.append(corner);
+      for (let column = 0; column < fleetSize; column += 1) {
+        const label = makeElement("span", "fleet-axis", String(column + 1));
+        label.setAttribute("role", "columnheader");
+        fleetBoardElement.append(label);
+      }
+      for (let row = 0; row < fleetSize; row += 1) {
+        const rowLabel = makeElement("span", "fleet-axis", fleetRows[row]);
+        rowLabel.setAttribute("role", "rowheader");
+        fleetBoardElement.append(rowLabel);
+        for (let column = 0; column < fleetSize; column += 1) {
+          const button = makeElement("button", "fleet-cell");
+          const coordinate = `${fleetRows[row]}${column + 1}`;
+          button.type = "button";
+          button.setAttribute("role", "gridcell");
+          button.setAttribute("aria-label", `${coordinate}, unsearched`);
+          button.addEventListener("click", () => scanFleetCell(row, column, button));
+          fleetBoardElement.append(button);
+        }
+      }
+    }
+
+    function scanFleetCell(row, column, button) {
+      if (fleetGameOver || button.disabled) return;
+      fleetShots += 1;
+      button.disabled = true;
+      const ship = fleetCells[row][column];
+      if (ship) {
+        ship.hits += 1;
+        button.classList.add("hit");
+        button.textContent = ship.icon;
+        button.setAttribute("aria-label", `${fleetRows[row]}${column + 1}, hit ${ship.name}`);
+        if (ship.hits === ship.length) {
+          ship.sunk = true;
+          fleetFeedback.textContent = `${ship.name} found!`;
+        } else {
+          fleetFeedback.textContent = `Hit! You found part of the ${ship.name.toLowerCase()}.`;
+        }
+      } else {
+        button.classList.add("miss");
+        button.textContent = "·";
+        button.setAttribute("aria-label", `${fleetRows[row]}${column + 1}, clear`);
+        fleetFeedback.textContent = "Clear skies in that square. Keep searching.";
+      }
+
+      fleetTurnsLabel.textContent = `Scans: ${fleetShots}`;
+      const foundCount = weatherFleet.filter(vessel => vessel.sunk).length;
+      fleetShipsLabel.textContent = `Storm systems found: ${foundCount} of ${weatherFleet.length}`;
+      if (foundCount === weatherFleet.length) {
+        fleetGameOver = true;
+        for (const cell of fleetBoardElement.querySelectorAll("button")) cell.disabled = true;
+        fleetFeedback.textContent = `Forecast complete! You found the whole fleet in ${fleetShots} scans.`;
+      }
+    }
+
+    function startFleetGame() {
+      fleetCells = deployFleet();
+      fleetShots = 0;
+      fleetGameOver = false;
+      fleetShipsLabel.textContent = `Storm systems found: 0 of ${weatherFleet.length}`;
+      fleetTurnsLabel.textContent = "Scans: 0";
+      fleetFeedback.textContent = "Choose a square to begin your search.";
+      renderFleet();
+    }
+
+    function createForecastDeck() {
+      const deck = [];
+      forecastCardId = 0;
+      const addCard = (suit, rank, kind = "regular") => {
+        deck.push({ id: forecastCardId++, suit, rank, kind });
+      };
+      for (const suit of forecastSuits) {
+        addCard(suit.id, 0);
+        for (let number = 1; number <= 9; number += 1) {
+          addCard(suit.id, number);
+          addCard(suit.id, number);
+        }
+        for (const action of ["skip", "reverse", "draw2"]) {
+          addCard(suit.id, action, "action");
+          addCard(suit.id, action, "action");
+        }
+      }
+      for (let copy = 0; copy < 4; copy += 1) {
+        addCard(null, "wild", "wild");
+        addCard(null, "wild4", "wild");
+      }
+      return deck;
+    }
+
+    function shuffleForecastDeck(deck) {
+      for (let index = deck.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [deck[index], deck[swapIndex]] = [deck[swapIndex], deck[index]];
+      }
+      return deck;
+    }
+
+    function drawForecastCard() {
+      if (!forecastDeck.length && forecastDiscardPile.length > 1) {
+        const topCard = forecastDiscardPile.pop();
+        forecastDeck = shuffleForecastDeck(forecastDiscardPile);
+        forecastDiscardPile = [topCard];
+      }
+      return forecastDeck.pop() || null;
+    }
+
+    function forecastCardLabel(card) {
+      if (card.rank === "wild") return "★";
+      if (card.rank === "wild4") return "+4";
+      if (card.rank === "skip") return "⏭";
+      if (card.rank === "reverse") return "↩";
+      if (card.rank === "draw2") return "+2";
+      return String(card.rank);
+    }
+
+    function forecastCardDescription(card) {
+      const suit = forecastSuits.find(candidate => candidate.id === card.suit);
+      const rank = {
+        skip: "Skip",
+        reverse: "Reverse",
+        draw2: "Draw two",
+        wild: "Forecast Shift wild",
+        wild4: "Storm Surge wild draw four"
+      }[card.rank] || card.rank;
+      return suit ? `${suit.name} ${rank}` : rank;
+    }
+
+    function makeForecastCardElement(card, small = false) {
+      const classNames = ["forecast-card", card.suit || "wild"];
+      if (small) classNames.push("forecast-card-small");
+      const element = makeElement("div", classNames.join(" "), forecastCardLabel(card));
+      element.setAttribute("aria-label", forecastCardDescription(card));
+      return element;
+    }
+
+    function canPlayForecastCard(card) {
+      const topCard = forecastDiscardPile[forecastDiscardPile.length - 1];
+      return card.kind === "wild" || card.suit === forecastCurrentSuit || card.rank === topCard.rank;
+    }
+
+    function renderForecastGame() {
+      forecastComputerCount.textContent = `Computer: ${forecastPlayers[1].length} cards`;
+      forecastPlayerCount.textContent = `Your hand: ${forecastPlayers[0].length} cards`;
+      forecastComputerHand.replaceChildren();
+      for (let index = 0; index < Math.min(forecastPlayers[1].length, 4); index += 1) {
+        const back = makeElement("div", "forecast-card forecast-card-small back", "☀");
+        back.setAttribute("aria-hidden", "true");
+        forecastComputerHand.append(back);
+      }
+      const topCard = forecastDiscardPile[forecastDiscardPile.length - 1];
+      forecastDiscard.replaceChildren();
+      if (topCard) forecastDiscard.append(makeForecastCardElement(topCard, true));
+      const activeSuit = forecastSuits.find(suit => suit.id === forecastCurrentSuit);
+      forecastSuitLabel.textContent = activeSuit
+        ? `Active weather: ${activeSuit.icon} ${activeSuit.name}`
+        : "";
+
+      forecastHand.replaceChildren();
+      forecastPlayers[0].forEach((card, index) => {
+        const button = makeElement(
+          "button",
+          `forecast-card forecast-hand-card ${card.suit || "wild"}`,
+          forecastCardLabel(card)
+        );
+        button.type = "button";
+        button.setAttribute("aria-label", `Play ${forecastCardDescription(card)}`);
+        button.setAttribute("title", `Play ${forecastCardDescription(card)}`);
+        const isPlayable = canPlayForecastCard(card) &&
+          (forecastDrewCardId === null || forecastDrewCardId === card.id);
+        button.disabled = forecastGameOver || forecastTurn !== 0 ||
+          forecastPendingWildIndex !== null || !isPlayable;
+        button.addEventListener("click", () => playForecastCard(index, 0));
+        forecastHand.append(button);
+      });
+
+      forecastDrawButton.disabled = forecastGameOver || forecastTurn !== 0 ||
+        forecastDrewCardId !== null || forecastPendingWildIndex !== null;
+      forecastPassButton.hidden = forecastDrewCardId === null || forecastGameOver || forecastTurn !== 0;
+      forecastPassButton.disabled = forecastGameOver || forecastTurn !== 0;
+      forecastChoice.hidden = forecastPendingWildIndex === null;
+      forecastChoice.replaceChildren();
+      if (forecastPendingWildIndex !== null) {
+        const prompt = makeElement("span", "forecast-choice-label", "Choose the next weather suit:");
+        forecastChoice.append(prompt);
+        for (const suit of forecastSuits) {
+          const button = makeElement("button", `forecast-suit ${suit.id}`, `${suit.icon} ${suit.name}`);
+          button.type = "button";
+          button.addEventListener("click", () => chooseForecastSuit(suit.id));
+          forecastChoice.append(button);
+        }
+      }
+    }
+
+    function startForecastGame() {
+      if (forecastAITimer !== null) {
+        clearTimeout(forecastAITimer);
+        forecastAITimer = null;
+      }
+      forecastDeck = shuffleForecastDeck(createForecastDeck());
+      forecastPlayers[0] = [];
+      forecastPlayers[1] = [];
+      for (let card = 0; card < 7; card += 1) {
+        forecastPlayers[0].push(drawForecastCard());
+        forecastPlayers[1].push(drawForecastCard());
+      }
+      const starterIndex = forecastDeck.findIndex(card => card.kind === "regular");
+      forecastDiscardPile = [forecastDeck.splice(starterIndex, 1)[0]];
+      forecastCurrentSuit = forecastDiscardPile[0].suit;
+      forecastTurn = 0;
+      forecastGameOver = false;
+      forecastDrewCardId = null;
+      forecastPendingWildIndex = null;
+      forecastFeedback.textContent = "Your turn. Play a matching card or draw one.";
+      renderForecastGame();
+    }
+
+    function scheduleForecastComputer() {
+      if (forecastAITimer !== null) clearTimeout(forecastAITimer);
+      forecastAITimer = setTimeout(() => {
+        forecastAITimer = null;
+        playForecastComputerTurn();
+      }, 550);
+    }
+
+    function playForecastCard(index, player) {
+      if (forecastGameOver || forecastTurn !== player) return;
+      const card = forecastPlayers[player][index];
+      if (!card || !canPlayForecastCard(card)) return;
+      if (player === 0 && forecastDrewCardId !== null && card.id !== forecastDrewCardId) return;
+      if (card.kind === "wild" && player === 0) {
+        forecastPendingWildIndex = index;
+        forecastFeedback.textContent = "Choose the suit for your wild card.";
+        renderForecastGame();
+        return;
+      }
+      const suit = card.kind === "wild"
+        ? chooseComputerForecastSuit()
+        : card.suit;
+      settleForecastPlay(index, player, suit);
+    }
+
+    function chooseForecastSuit(suit) {
+      if (forecastPendingWildIndex === null || forecastTurn !== 0) return;
+      const cardIndex = forecastPendingWildIndex;
+      forecastPendingWildIndex = null;
+      settleForecastPlay(cardIndex, 0, suit);
+    }
+
+    function chooseComputerForecastSuit() {
+      const counts = Object.fromEntries(forecastSuits.map(suit => [suit.id, 0]));
+      for (const card of forecastPlayers[1]) {
+        if (card.suit) counts[card.suit] += 1;
+      }
+      return forecastSuits.reduce((best, suit) =>
+        counts[suit.id] > counts[best.id] ? suit : best
+      , forecastSuits[0]).id;
+    }
+
+    function settleForecastPlay(index, player, chosenSuit) {
+      const [card] = forecastPlayers[player].splice(index, 1);
+      forecastDiscardPile.push(card);
+      forecastCurrentSuit = chosenSuit;
+      forecastDrewCardId = null;
+
+      if (forecastPlayers[player].length === 0) {
+        forecastGameOver = true;
+        forecastFeedback.textContent = player === 0
+          ? "You cleared the forecast and won!"
+          : "The computer cleared its forecast. Better luck next game!";
+        renderForecastGame();
+        return;
+      }
+
+      let nextTurn = player === 0 ? 1 : 0;
+      let feedback = `${player === 0 ? "You played" : "Computer played"} ${forecastCardDescription(card)}.`;
+      if (forecastPlayers[player].length === 1) feedback += " One card left!";
+      if (card.rank === "skip" || card.rank === "reverse") {
+        nextTurn = player;
+        feedback += " The next turn is skipped.";
+      } else if (card.rank === "draw2" || card.rank === "wild4") {
+        const amount = card.rank === "draw2" ? 2 : 4;
+        const recipient = player === 0 ? 1 : 0;
+        for (let draw = 0; draw < amount; draw += 1) {
+          const drawn = drawForecastCard();
+          if (drawn) forecastPlayers[recipient].push(drawn);
+        }
+        nextTurn = player;
+        feedback += ` The other side draws ${amount} and misses a turn.`;
+      }
+      if (card.kind === "wild") {
+        const suit = forecastSuits.find(candidate => candidate.id === chosenSuit);
+        feedback += ` The forecast changes to ${suit.name}.`;
+      }
+      forecastTurn = nextTurn;
+      forecastFeedback.textContent = feedback;
+      renderForecastGame();
+      if (forecastTurn === 1) scheduleForecastComputer();
+    }
+
+    function drawForecastForPlayer() {
+      if (forecastGameOver || forecastTurn !== 0 || forecastDrewCardId !== null) return;
+      const card = drawForecastCard();
+      if (!card) {
+        forecastFeedback.textContent = "The draw pile is empty. Pass your turn.";
+        forecastDrewCardId = -1;
+        renderForecastGame();
+        return;
+      }
+      forecastPlayers[0].push(card);
+      if (canPlayForecastCard(card)) {
+        forecastDrewCardId = card.id;
+        forecastFeedback.textContent = `You drew ${forecastCardDescription(card)}. Play it or pass your turn.`;
+        renderForecastGame();
+      } else {
+        forecastFeedback.textContent = `You drew ${forecastCardDescription(card)}. It does not match, so your turn passes.`;
+        forecastDrewCardId = null;
+        forecastTurn = 1;
+        renderForecastGame();
+        scheduleForecastComputer();
+      }
+    }
+
+    function passForecastTurn() {
+      if (forecastGameOver || forecastTurn !== 0 || forecastDrewCardId === null) return;
+      forecastDrewCardId = null;
+      forecastTurn = 1;
+      forecastFeedback.textContent = "You passed. The computer's turn.";
+      renderForecastGame();
+      scheduleForecastComputer();
+    }
+
+    function playForecastComputerTurn() {
+      if (forecastGameOver || forecastTurn !== 1) return;
+      const hand = forecastPlayers[1];
+      const playableIndex = hand.findIndex(canPlayForecastCard);
+      if (playableIndex >= 0) {
+        const card = hand[playableIndex];
+        const suit = card.kind === "wild" ? chooseComputerForecastSuit() : card.suit;
+        settleForecastPlay(playableIndex, 1, suit);
+        return;
+      }
+
+      const drawn = drawForecastCard();
+      if (drawn) hand.push(drawn);
+      const drawnIndex = drawn ? hand.length - 1 : -1;
+      if (drawn && canPlayForecastCard(drawn)) {
+        const suit = drawn.kind === "wild" ? chooseComputerForecastSuit() : drawn.suit;
+        forecastFeedback.textContent = "Computer draws and plays a matching card.";
+        settleForecastPlay(drawnIndex, 1, suit);
+      } else {
+        forecastTurn = 0;
+        forecastFeedback.textContent = drawn
+          ? "Computer draws a card and passes. Your turn."
+          : "The computer passes. Your turn.";
+        renderForecastGame();
+      }
+    }
+
+    function renderCurrent(period) {
+      const description = period.shortForecast || "Forecast available";
+      document.getElementById("main-icon").textContent = weatherIcon(description);
+      document.getElementById("main-temp").textContent = getTemperature(period);
+      document.getElementById("main-condition").textContent = description;
+
+      const details = document.getElementById("current-details");
+      details.replaceChildren();
+      const values = [
+        period.isDaytime ? "Daytime forecast" : "Tonight's forecast",
+        `Wind ${formatWind(period.windSpeed)} ${period.windDirection || ""}`.trim(),
+        period.relativeHumidity && period.relativeHumidity.value !== null
+          ? `Humidity ${Math.round(period.relativeHumidity.value)}%`
+          : null,
+        period.probabilityOfPrecipitation && period.probabilityOfPrecipitation.value !== null
+          ? `Rain chance ${period.probabilityOfPrecipitation.value}%`
+          : null
+      ].filter(Boolean);
+      for (const value of values) details.append(makeElement("span", "detail-pill", value));
+
+      const date = new Date(period.startTime);
+      const isCurrentHour = date <= new Date() && new Date(period.endTime) > new Date();
+      document.getElementById("updated").textContent = isCurrentHour
+        ? `This hour · through ${formatTime(period.endTime, { hour: "numeric", minute: "2-digit" })}`
+        : `Next forecast period · ${formatTime(period.startTime, { hour: "numeric" })}`;
+    }
+
+    function renderHourly(periods) {
+      hourlyContainer.replaceChildren();
+      for (const [index, period] of periods.slice(0, 12).entries()) {
+        const card = makeElement("article", "card hour");
+        const time = index === 0 ? "Now" : formatTime(period.startTime, { hour: "numeric" });
+        card.append(
+          makeElement("div", "hour-time", time),
+          makeElement("div", "hour-icon", weatherIcon(period.shortForecast)),
+          makeElement("div", "hour-temp", getTemperature(period)),
+          makeElement("div", "hour-rain",
+            period.probabilityOfPrecipitation && period.probabilityOfPrecipitation.value !== null
+              ? `☂ ${period.probabilityOfPrecipitation.value}%`
+              : " ")
+        );
+        hourlyContainer.append(card);
+      }
+    }
+
+    function renderDaily(periods) {
+      dailyContainer.replaceChildren();
+      const daytime = periods.filter(period => period.isDaytime).slice(0, 7);
+      for (const period of daytime) {
+        const row = makeElement("div", "day-row");
+        const day = makeElement("div", "day-name");
+        const date = new Date(period.startTime);
+        day.append(makeElement("span", "day-symbol", weatherIcon(period.shortForecast)));
+        day.append(document.createTextNode(formatTime(date, {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        })));
+
+        const temperature = makeElement("div", "day-temp");
+        temperature.textContent = getTemperature(period);
+        const nighttime = periods.find(candidate =>
+          !candidate.isDaytime &&
+          new Date(candidate.startTime).toDateString() === date.toDateString()
+        );
+        if (nighttime) temperature.append(makeElement("span", "", `/ ${getTemperature(nighttime)}`));
+
+        const condition = makeElement("div", "day-condition", period.shortForecast || "—");
+        const rain = makeElement("div", "day-rain",
+          period.probabilityOfPrecipitation && period.probabilityOfPrecipitation.value !== null
+            ? `☂ ${period.probabilityOfPrecipitation.value}% chance`
+            : " ");
+        row.append(day, temperature, condition, rain);
+        dailyContainer.append(row);
+      }
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, {
+        headers: { Accept: "application/geo+json" }
+      });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}.`);
+      }
+      return response.json();
+    }
+
+    function updateRadarLocation() {
+      const latitude = selectedLocation.latitude;
+      const longitude = selectedLocation.longitude;
+      const coordinates = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+      const iframe = document.querySelector(".radar-frame");
+      iframe.src = `https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&detailLat=${latitude}&detailLon=${longitude}&width=650&height=450&zoom=8&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=${temperatureUnit === "F" ? "mph" : "kmh"}&metricTemp=%C2%B0${temperatureUnit}`;
+      document.querySelector(".radar-link").href =
+        `https://www.windy.com/${coordinates}?radar,${coordinates},8`;
+    }
+
+    async function loadAlerts(forecastZone, requestId) {
+      const zoneId = forecastZone && forecastZone.split("/").pop();
+      if (!zoneId) {
+        if (requestId === forecastLoadId) renderAlerts([], "The NWS did not provide an alert zone for this location.");
+        return;
+      }
+      try {
+        const data = await fetchJson(`https://api.weather.gov/alerts/active?zone=${encodeURIComponent(zoneId)}`);
+        if (requestId === forecastLoadId) renderAlerts(data.features || []);
+      } catch (error) {
+        if (requestId === forecastLoadId) renderAlerts([], `NWS alerts could not be loaded: ${error.message}`);
+      }
+    }
+
+    function openMeteoUnits() {
+      return temperatureUnit === "F"
+        ? { temperature_unit: "fahrenheit", wind_speed_unit: "mph" }
+        : { temperature_unit: "celsius", wind_speed_unit: "kmh" };
+    }
+
+    async function loadSupplementaryWeather(location, requestId) {
+      const units = new URLSearchParams(openMeteoUnits());
+      const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
+      forecastUrl.search = new URLSearchParams({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        current: "apparent_temperature,relative_humidity_2m,wind_gusts_10m,uv_index",
+        hourly: "precipitation_probability,precipitation",
+        daily: "sunrise,sunset",
+        timezone: "auto",
+        forecast_days: "2",
+        ...Object.fromEntries(units)
+      }).toString();
+      const airUrl = new URL("https://air-quality-api.open-meteo.com/v1/air-quality");
+      airUrl.search = new URLSearchParams({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        current: "us_aqi,pm2_5,ozone",
+        timezone: "auto"
+      }).toString();
+      const [weatherResult, airResult] = await Promise.allSettled([
+        fetchJson(forecastUrl.toString()),
+        fetchJson(airUrl.toString())
+      ]);
+      if (requestId !== forecastLoadId) return;
+      const weather = weatherResult.status === "fulfilled" ? weatherResult.value : null;
+      const air = airResult.status === "fulfilled" ? airResult.value : null;
+      renderSupplementary(weather, air);
+      if (weatherResult.status === "rejected") {
+        document.getElementById("feels-like").textContent = "Unavailable";
+        document.getElementById("humidity").textContent = `Weather details unavailable: ${weatherResult.reason.message}`;
+        document.getElementById("wind-gusts").textContent = "Unavailable";
+        document.getElementById("uv-index").textContent = "Unavailable";
+        document.getElementById("uv-note").textContent = "Supplementary weather request failed";
+        document.getElementById("sunrise").textContent = "Unavailable";
+        document.getElementById("sunset").textContent = "Sunset unavailable";
+        document.getElementById("rain-timing").textContent = "Unavailable";
+        document.getElementById("rain-timing-note").textContent = "Rain forecast request failed";
+      }
+      if (airResult.status === "rejected") {
+        document.getElementById("air-quality").textContent = "Unavailable";
+        document.getElementById("air-quality-note").textContent = `Air quality request failed: ${airResult.reason.message}`;
+      }
+    }
+
+    function updateLocation(location) {
+      selectedLocation = location;
+      renderLocationControls();
+      savePreference(STORAGE_KEYS.selected, locationKey(location));
+      updateRadarLocation();
+      loadForecast();
+    }
+
+    function addSavedLocation(location) {
+      const existing = locations.find(item => locationKey(item) === locationKey(location));
+      if (existing) {
+        locationFeedback.textContent = `${locationName(existing)} is already saved.`;
+        locationResults.replaceChildren();
+        return;
+      }
+      locations.push(location);
+      saveLocations();
+      locationResults.replaceChildren();
+      locationSearch.value = "";
+      locationFeedback.textContent = `${locationName(location)} added to saved locations.`;
+      updateLocation(location);
+    }
+
+    async function searchLocations() {
+      const query = locationSearch.value.trim();
+      if (query.length < 2) {
+        locationFeedback.textContent = "Enter at least two characters to search for a city.";
+        return;
+      }
+      const searchButton = document.getElementById("search-location");
+      searchButton.disabled = true;
+      locationFeedback.textContent = "Searching for cities…";
+      locationResults.replaceChildren();
+      try {
+        const url = new URL("https://geocoding-api.open-meteo.com/v1/search");
+        url.search = new URLSearchParams({
+          name: query,
+          count: "5",
+          language: "en",
+          format: "json",
+          countryCode: "US"
+        }).toString();
+        const data = await fetchJson(url.toString());
+        const results = (data.results || []).filter(result =>
+          Number.isFinite(result.latitude) && Number.isFinite(result.longitude)
+        );
+        if (!results.length) {
+          locationFeedback.textContent = `No US cities found for “${query}”.`;
+          return;
+        }
+        locationFeedback.textContent = "Choose a city to add it to your saved locations.";
+        for (const result of results) {
+          const location = {
+            name: result.name,
+            admin: result.admin1 || result.country || "US",
+            country: result.country_code || "US",
+            latitude: result.latitude,
+            longitude: result.longitude
+          };
+          const button = makeElement("button", "location-result", `＋ ${locationName(location)}`);
+          button.type = "button";
+          button.addEventListener("click", () => addSavedLocation(location));
+          locationResults.append(button);
+        }
+      } catch (error) {
+        locationFeedback.textContent = `City search failed: ${error.message}`;
+      } finally {
+        searchButton.disabled = false;
+      }
+    }
+
+    async function loadForecast() {
+      const requestId = ++forecastLoadId;
+      const location = selectedLocation;
+      refreshButton.disabled = true;
+      errorBox.hidden = true;
+      document.getElementById("updated").textContent = "Loading the latest forecast…";
+
+      try {
+        const point = await fetchJson(
+          `https://api.weather.gov/points/${location.latitude},${location.longitude}`
+        );
+        if (requestId !== forecastLoadId) return;
+        const properties = point.properties;
+        const [hourly, daily] = await Promise.all([
+          fetchJson(properties.forecastHourly),
+          fetchJson(properties.forecast)
+        ]);
+        if (requestId !== forecastLoadId) return;
+        const hourlyPeriods = hourly.properties.periods;
+        if (!hourlyPeriods.length || !daily.properties.periods.length) {
+          throw new Error("The NWS returned no forecast periods for this location.");
+        }
+
+        renderCurrent(hourlyPeriods[0]);
+        renderHourly(hourlyPeriods);
+        renderDaily(daily.properties.periods);
+        document.getElementById("office").textContent =
+          `Forecast office: ${properties.gridId || "NWS"} · ${properties.gridX}, ${properties.gridY}`;
+        await Promise.all([
+          loadAlerts(properties.forecastZone, requestId),
+          loadSupplementaryWeather(location, requestId)
+        ]);
+      } catch (error) {
+        if (requestId !== forecastLoadId) return;
+        errorBox.textContent = `${error.message} Check your internet connection and try refreshing.`;
+        errorBox.hidden = false;
+        document.getElementById("updated").textContent = "Forecast could not be loaded.";
+        renderAlerts([], `NWS alerts unavailable because the location forecast could not be loaded: ${error.message}`);
+      } finally {
+        if (requestId === forecastLoadId) refreshButton.disabled = false;
+      }
+    }
+
+    refreshButton.addEventListener("click", loadForecast);
+    document.getElementById("next-weather-fact").addEventListener("click", () => {
+      weatherFactIndex = (weatherFactIndex + 1) % weatherFacts.length;
+      renderWeatherFact();
+    });
+    safetyReset.addEventListener("click", resetSafetyChallenge);
+    document.getElementById("radar-hunt-reset").addEventListener("click", resetRadarHunt);
+    document.getElementById("weather-tab").addEventListener("click", () => setClimateView("weather"));
+    document.getElementById("climate-tab").addEventListener("click", () => setClimateView("climate"));
+    locationSelect.addEventListener("change", () => {
+      const location = locations.find(item => locationKey(item) === locationSelect.value);
+      if (location) updateLocation(location);
+    });
+    document.getElementById("remove-location").addEventListener("click", () => {
+      if (locationKey(selectedLocation) === locationKey(DEFAULT_LOCATIONS[0])) return;
+      const removedKey = locationKey(selectedLocation);
+      locations = locations.filter(location => locationKey(location) !== removedKey);
+      saveLocations();
+      selectedLocation = locations[0];
+      renderLocationControls();
+      locationFeedback.textContent = "Location removed from your saved places.";
+      updateRadarLocation();
+      loadForecast();
+    });
+    document.getElementById("search-location").addEventListener("click", searchLocations);
+    locationSearch.addEventListener("keydown", event => {
+      if (event.key === "Enter") searchLocations();
+    });
+    unitToggle.addEventListener("click", () => {
+      temperatureUnit = temperatureUnit === "F" ? "C" : "F";
+      savePreference(STORAGE_KEYS.units, temperatureUnit);
+      renderLocationControls();
+      updateRadarLocation();
+      loadForecast();
+    });
+    fleetRestartButton.addEventListener("click", startFleetGame);
+    forecastDrawButton.addEventListener("click", drawForecastForPlayer);
+    forecastPassButton.addEventListener("click", passForecastTurn);
+    forecastNewButton.addEventListener("click", startForecastGame);
+    quizAction.addEventListener("click", () => {
+      if (quizProgress.textContent === "Quiz complete") restartQuiz();
+      else advanceQuiz();
+    });
+    renderQuizQuestion();
+    renderWeatherFact();
+    resetSafetyChallenge();
+    resetRadarHunt();
+    setClimateView("weather");
+    startFleetGame();
+    startForecastGame();
+    loadPreferences();
+    renderLocationControls();
+    updateRadarLocation();
+    loadForecast();
+  </script>
+</body>
+</html>
